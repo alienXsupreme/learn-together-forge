@@ -33,15 +33,27 @@ const mockMessages = [
   },
 ];
 
+interface CourseInfo {
+  id: string;
+  name: string;
+}
+
 interface StudyRoomProps {
   roomId: string;
   roomName: string;
+  courseInfo?: CourseInfo;
 }
 
-const StudyRoom: React.FC<StudyRoomProps> = ({ roomId, roomName }) => {
+const StudyRoom: React.FC<StudyRoomProps> = ({ roomId, roomName, courseInfo }) => {
   const [participants, setParticipants] = useState(mockParticipants);
   const [messages, setMessages] = useState(mockMessages);
-  const [notes, setNotes] = useState('# Study Session Notes\n\n## Topics to Cover\n- Chapter 5: Quantum Mechanics\n- Practice problems 5.1-5.10\n- Review midterm concepts');
+  
+  // Set default notes based on course if available
+  const defaultNotes = courseInfo?.id 
+    ? `# ${courseInfo.name} Study Session Notes\n\n## Topics to Cover\n- Key concepts from the course\n- Practice problems\n- Exam preparation strategies\n\n## Resources\n- Course materials\n- Reference books\n- Online resources`
+    : '# Study Session Notes\n\n## Topics to Cover\n- Chapter 5: Quantum Mechanics\n- Practice problems 5.1-5.10\n- Review midterm concepts';
+  
+  const [notes, setNotes] = useState(defaultNotes);
   
   // Toggle audio/video controls
   const toggleMute = () => {
@@ -78,7 +90,16 @@ const StudyRoom: React.FC<StudyRoomProps> = ({ roomId, roomName }) => {
   return (
     <div className="h-[calc(100vh-4rem)] p-4 flex flex-col">
       <div className="flex justify-between mb-4 items-center">
-        <h1 className="text-xl font-bold text-gray-800">{roomName}</h1>
+        <div>
+          <h1 className="text-xl font-bold text-gray-800">{roomName}</h1>
+          {courseInfo?.id && (
+            <div className="flex items-center mt-1">
+              <span className="text-xs font-mono bg-study-light text-study-primary px-2 py-1 rounded">
+                {courseInfo.id}
+              </span>
+            </div>
+          )}
+        </div>
         <div className="flex items-center space-x-3">
           <Button 
             variant={isUserMuted ? "destructive" : "outline"}
